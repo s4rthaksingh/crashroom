@@ -4,6 +4,7 @@
     "description": "Welcome to the crashroom",
     "dependencies": {
         "express": "^4.21.2",
+        "random-username-generator": "^1.0.4",
         "socket.io": "^4.8.1"
     }
 }
