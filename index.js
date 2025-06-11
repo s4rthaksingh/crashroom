@@ -61,8 +61,10 @@ io.on('connection',(socket)=>{
                 return;
             }
         }
-        if (message.message == "/scramble"){
-            chosenword = generate({minLength:6});
+        if (message.message.startsWith("/scramble")){
+            chosenword = generate({minLength:parseInt(message.message.split(" ")[1]) || 6,
+                maxLength : parseInt(message.message.split(" ")[1]) || null
+            });
             io.emit('message',{'message':`${message.username} has started a game of scramble. The scrambled word is : ${shuffle(chosenword)}`,'username':'System'});
             console.log(chosenword);
             return;
