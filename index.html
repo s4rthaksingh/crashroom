@@ -49,13 +49,7 @@
       }
 
       // Initialize socket with optimized settings
-      const socket = io({
-          transports: ['websocket'],
-          path: '/socket.io/',
-          reconnection: true,
-          reconnectionAttempts: 5,
-          reconnectionDelay: 1000
-      });
+      const socket = io();
 
       // Optimize message display
       function displayMessage(message) {
