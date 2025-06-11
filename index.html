@@ -16,11 +16,10 @@
     </style>
   </head>
   <body>
-
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" />
-      <input id="username" autocomplete="off" />
+      <input id="username" autocomplete="off" placeholder="Enter your username" />
       <button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
@@ -36,43 +35,48 @@
         const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
         
         return `${randomAdj}${randomNoun}${number}`;
-}
+      }
+
       function getCurrentTime() {
-      const now = new Date();
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-      
-      // Format the time to HH:MM
-      const formattedHours = String(hours).padStart(2, '0');
-      const formattedMinutes = String(minutes).padStart(2, '0');
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        
+        const formattedHours = String(hours).padStart(2, '0');
+        const formattedMinutes = String(minutes).padStart(2, '0');
 
-      return `${formattedHours}:${formattedMinutes}`;
-    }
-    var socket = io({
-        transports: ['polling', 'websocket'],
-        path: '/socket.io/'
-    });
-    var messages = document.getElementById('messages');
-    var form = document.getElementById("form");
-    var input = document.getElementById('input');
-    var username = document.getElementById('username');
-    var usercount = document.getElementById('usercount');
-    form.addEventListener('submit',function(event){
-        event.preventDefault();
-        if(!username.value) username.value = generateUsername();
-        if(input.value){
-            socket.emit('message',{'message':input.value, 'username':username.value});
-            input.value = '';
-        }
-    })
+        return `${formattedHours}:${formattedMinutes}`;
+      }
 
-    socket.on('message',(message)=>{
-        var item = document.createElement('li');
-        item.innerHTML=`<b>${message.username}</b> (${getCurrentTime()})<br>${message.message}`;
-        messages.append(item);
-        window.scrollTo(0,document.body.scrollHeight);
-    })
+      var socket = io({
+          transports: ['polling', 'websocket'],
+          path: '/socket.io/'
+      });
+      var messages = document.getElementById('messages');
+      var form = document.getElementById("form");
+      var input = document.getElementById('input');
+      var username = document.getElementById('username');
 
+      form.addEventListener('submit', function(event) {
+          event.preventDefault();
+          if(input.value) {
+              if(!username.value) {
+                  username.value = generateUsername();
+              }
+              socket.emit('message', {
+                  'message': input.value,
+                  'username': username.value
+              });
+              input.value = '';
+          }
+      });
+
+      socket.on('message', (message) => {
+          var item = document.createElement('li');
+          item.innerHTML = `<b>${message.username}</b> (${getCurrentTime()})<br>${message.message}`;
+          messages.append(item);
+          window.scrollTo(0, document.body.scrollHeight);
+      });
     </script>
   </body>
 </html>
