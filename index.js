@@ -12,6 +12,7 @@ function generateUsername(){
 }
 
 
+let usercount = 0;
 
 const express = require('express');
 const app = express();
@@ -30,6 +31,8 @@ app.get('/',(req,res)=>{
 })
 
 io.on('connection',(socket)=>{
+    usercount+=1;
+    io.emit("updateCount",usercount);
     const username = generateUsername();
     socket.username = username;
     io.emit('setUsername',username);
@@ -49,6 +52,8 @@ io.on('connection',(socket)=>{
         io.emit('message', message);
     })
     socket.on('disconnect',()=>{
+        usercount-=1;
+        io.emit("updateCount",usercount);
         io.emit('message',{
             'message':'left the chat',
             'username': socket.username
