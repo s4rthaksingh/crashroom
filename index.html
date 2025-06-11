@@ -67,7 +67,7 @@
       }
 
       username.addEventListener('change',()=>{
-        if(username.value) socket.emit('changeUsername',username.value);
+        if(username.value && username.value.toLowerCase()!="system") socket.emit('changeUsername',username.value);
       })
 
       form.addEventListener('submit', function(event) {
@@ -75,7 +75,7 @@
           if(input.value) {
               socket.emit('message', {
                   'message': input.value,
-                  'username': username.value
+                  'username': username.value.replace(/\s/g, '')
               });
               input.value = '';
           }

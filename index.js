@@ -1,3 +1,6 @@
+const { generate, count } = require("random-words");
+
+const shuffle = str => [...str].sort(()=>Math.random()-.5).join('');
 function generateUsername(){
     const adjectives = ['Happy', 'Clever', 'Brave', 'Swift', 'Bright', 'Calm', 'Eager', 'Fierce', 'Gentle', 'Jolly', 
         'Lively', 'Mighty', 'Nimble', 'Proud', 'Quick', 'Royal', 'Smart', 'Tender', 'Vivid', 'Wise'];
@@ -13,6 +16,8 @@ function generateUsername(){
 
 
 let usercount = 0;
+let chosenword = null;
+
 
 const express = require('express');
 const app = express();
@@ -48,7 +53,20 @@ io.on('connection',(socket)=>{
         socket.username = newusername;
     })
     socket.on('message',(message)=>{
-        if (!message.username) message.username = socket.username;
+        if (!message.username || message.username.toLowerCase() == "system") message.username = socket.username;
+        if (chosenword) {
+            if(message.message == chosenword){
+                io.emit('message', {'message':`has guessed the right word : ${chosenword}`,username:socket.username});
+                chosenword = null;
+                return;
+            }
+        }
+        if (message.message == "/scramble"){
+            chosenword = generate({minLength:6});
+            io.emit('message',{'message':`${message.username} has started a game of scramble. The scrambled word is : ${shuffle(chosenword)}`,'username':'System'});
+            console.log(chosenword);
+            return;
+        }
         io.emit('message', message);
     })
     socket.on('disconnect',()=>{
