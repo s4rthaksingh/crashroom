@@ -8,9 +8,10 @@ const io = new Server(server, {
         origin: "*",
         methods: ["GET", "POST"]
     },
-    transports: ['polling', 'websocket'],
-    allowEIO3: true,
-    path: '/socket.io/'
+    transports: ['websocket'],
+    path: '/socket.io/',
+    pingTimeout: 60000,
+    pingInterval: 25000
 });
 
 app.get('/',(req,res)=>{

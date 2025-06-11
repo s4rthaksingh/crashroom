@@ -24,38 +24,46 @@
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+      // Cache DOM elements
+      const messages = document.getElementById('messages');
+      const form = document.getElementById("form");
+      const input = document.getElementById('input');
+      const username = document.getElementById('username');
+
+      // Pre-generate username arrays
+      const adjectives = ['Happy', 'Clever', 'Brave', 'Swift', 'Bright', 'Calm', 'Eager', 'Fierce', 'Gentle', 'Jolly', 
+                        'Lively', 'Mighty', 'Nimble', 'Proud', 'Quick', 'Royal', 'Smart', 'Tender', 'Vivid', 'Wise'];
+      const nouns = ['Panda', 'Tiger', 'Eagle', 'Dolphin', 'Wolf', 'Lion', 'Fox', 'Bear', 'Hawk', 'Shark',
+                    'Dragon', 'Phoenix', 'Falcon', 'Lynx', 'Puma', 'Jaguar', 'Leopard', 'Panther', 'Cobra', 'Python'];
+
       function generateUsername() {
-        const adjectives = ['Happy', 'Clever', 'Brave', 'Swift', 'Bright', 'Calm', 'Eager', 'Fierce', 'Gentle', 'Jolly', 
-                          'Lively', 'Mighty', 'Nimble', 'Proud', 'Quick', 'Royal', 'Smart', 'Tender', 'Vivid', 'Wise'];
-        const nouns = ['Panda', 'Tiger', 'Eagle', 'Dolphin', 'Wolf', 'Lion', 'Fox', 'Bear', 'Hawk', 'Shark',
-                      'Dragon', 'Phoenix', 'Falcon', 'Lynx', 'Puma', 'Jaguar', 'Leopard', 'Panther', 'Cobra', 'Python'];
         const number = Math.floor(Math.random() * 10000);
-        
         const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
         const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-        
         return `${randomAdj}${randomNoun}${number}`;
       }
 
       function getCurrentTime() {
         const now = new Date();
-        const hours = now.getHours();
-        const minutes = now.getMinutes();
-        
-        const formattedHours = String(hours).padStart(2, '0');
-        const formattedMinutes = String(minutes).padStart(2, '0');
-
-        return `${formattedHours}:${formattedMinutes}`;
+        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       }
 
-      var socket = io({
-          transports: ['polling', 'websocket'],
-          path: '/socket.io/'
+      // Initialize socket with optimized settings
+      const socket = io({
+          transports: ['websocket'],
+          path: '/socket.io/',
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000
       });
-      var messages = document.getElementById('messages');
-      var form = document.getElementById("form");
-      var input = document.getElementById('input');
-      var username = document.getElementById('username');
+
+      // Optimize message display
+      function displayMessage(message) {
+        const item = document.createElement('li');
+        item.innerHTML = `<b>${message.username}</b> (${getCurrentTime()})<br>${message.message}`;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      }
 
       form.addEventListener('submit', function(event) {
           event.preventDefault();
@@ -71,12 +79,7 @@
           }
       });
 
-      socket.on('message', (message) => {
-          var item = document.createElement('li');
-          item.innerHTML = `<b>${message.username}</b> (${getCurrentTime()})<br>${message.message}`;
-          messages.append(item);
-          window.scrollTo(0, document.body.scrollHeight);
-      });
+      socket.on('message', displayMessage);
     </script>
   </body>
 </html>
