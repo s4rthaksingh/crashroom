@@ -28,7 +28,6 @@ app.get('/',(req,res)=>{
 })
 
 io.on('connection',(socket)=>{
-    console.log("A user connected");
     io.emit('newuser',io.engine.clientsCount)
     io.emit('send',{'message':"has joined the chat",'username':'A new user'})
     socket.on('send',(send)=>{
@@ -40,7 +39,7 @@ io.on('connection',(socket)=>{
     })
 })
 
-const port = process.env.port || 3000;
-server.listen(port, '0.0.0.0', () => {
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
     console.log(`Listening on ${port}...`);
 })
