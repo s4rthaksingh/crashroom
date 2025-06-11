@@ -90,21 +90,18 @@
         event.preventDefault();
         if(!username.value) username.value = generateUsername();
         if(input.value){
-            socket.emit('send',{'message':input.value, 'username':username.value});
+            socket.emit('message',{'message':input.value, 'username':username.value});
             input.value = '';
         }
     })
 
-    socket.on('send',(send)=>{
+    socket.on('message',(message)=>{
         var item = document.createElement('li');
-        item.innerHTML=`<b>${send.username}</b> (${getCurrentTime()})<br>${send.message}`;
+        item.innerHTML=`<b>${message.username}</b> (${getCurrentTime()})<br>${message.message}`;
         messages.append(item);
         window.scrollTo(0,document.body.scrollHeight);
     })
 
-    socket.on('newuser',(count)=>{
-      usercount.textContent = `${count} user${count !== 1 ? 's' : ''} online`;
-    })
     </script>
   </body>
 </html>

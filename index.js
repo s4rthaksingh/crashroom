@@ -28,14 +28,8 @@ app.get('/',(req,res)=>{
 })
 
 io.on('connection',(socket)=>{
-    io.emit('newuser',io.engine.clientsCount)
-    io.emit('send',{'message':"has joined the chat",'username':'A new user'})
-    socket.on('send',(send)=>{
-        io.emit('send',send);
-    })
-    socket.on('disconnect',()=>{
-        io.emit('send',{'message':"has left the chat",'username':'A user'})
-        io.emit('newuser',io.engine.clientsCount)
+    socket.on('message',(message)=>{
+        io.emit('message',send);
     })
 })
 
