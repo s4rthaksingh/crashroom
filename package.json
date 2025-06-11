@@ -1,10 +1,13 @@
 {
-    "name": "socket-crashroom",
+    "name": "crashroom",
     "version": "0.0.1",
     "description": "Welcome to the crashroom",
+    "main":"index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
     "dependencies": {
         "express": "^4.21.2",
-        "random-username-generator": "^1.0.4",
         "socket.io": "^4.8.1"
     }
 }
