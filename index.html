@@ -13,39 +13,10 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
-
-      #online-users {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 8px 16px;
-        border-radius: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-
-      #online-dot {
-        width: 12px;
-        height: 12px;
-        background-color: #4CAF50;
-        border-radius: 50%;
-        display: inline-block;
-      }
-
-      #user-count {
-        font-size: 14px;
-        color: #333;
-      }
     </style>
   </head>
   <body>
-    <div id="online-users">
-      <span id="online-dot"></span>
-      <span id="usercount">0 users online</span>
-    </div>
+
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" />

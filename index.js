@@ -29,7 +29,7 @@ app.get('/',(req,res)=>{
 
 io.on('connection',(socket)=>{
     socket.on('message',(message)=>{
-        io.emit('message',send);
+        io.emit('message',message);
     })
 })
 
