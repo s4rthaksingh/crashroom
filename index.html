@@ -30,19 +30,6 @@
       const input = document.getElementById('input');
       const username = document.getElementById('username');
 
-      // Pre-generate username arrays
-      const adjectives = ['Happy', 'Clever', 'Brave', 'Swift', 'Bright', 'Calm', 'Eager', 'Fierce', 'Gentle', 'Jolly', 
-                        'Lively', 'Mighty', 'Nimble', 'Proud', 'Quick', 'Royal', 'Smart', 'Tender', 'Vivid', 'Wise'];
-      const nouns = ['Panda', 'Tiger', 'Eagle', 'Dolphin', 'Wolf', 'Lion', 'Fox', 'Bear', 'Hawk', 'Shark',
-                    'Dragon', 'Phoenix', 'Falcon', 'Lynx', 'Puma', 'Jaguar', 'Leopard', 'Panther', 'Cobra', 'Python'];
-
-      function generateUsername() {
-        const number = Math.floor(Math.random() * 10000);
-        const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
-        const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-        return `${randomAdj}${randomNoun}${number}`;
-      }
-
       function getCurrentTime() {
         const now = new Date();
         return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -63,12 +50,13 @@
         window.scrollTo(0, document.body.scrollHeight);
       }
 
+      username.addEventListener('change',()=>{
+        if(username.value) socket.emit('changeUsername',username.value);
+      })
+
       form.addEventListener('submit', function(event) {
           event.preventDefault();
           if(input.value) {
-              if(!username.value) {
-                  username.value = generateUsername();
-              }
               socket.emit('message', {
                   'message': input.value,
                   'username': username.value
@@ -77,6 +65,9 @@
           }
       });
 
+      socket.on('setUsername',(assignedusername)=>{
+        username.value = assignedusername;
+      })
       socket.on('message', displayMessage);
     </script>
   </body>
