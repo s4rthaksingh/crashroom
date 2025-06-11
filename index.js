@@ -20,10 +20,8 @@ io.on('connection',(socket)=>{
     })
 })
 
-// if(process.env.NODE_ENV !== 'production'){
-//     const port = process.env.PORT || 3000;
-//     server.listen(port, () => {
-//         console.log(`Listening on ${port}...`);
-//     })
-// }
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
 
