@@ -40,7 +40,7 @@ io.on('connection',(socket)=>{
     io.emit("updateCount",usercount);
     const username = generateUsername();
     socket.username = username;
-    io.emit('setUsername',username);
+    socket.emit('setUsername',username);
     io.emit('message',{
         'message':'has joined the chat',
         'username':socket.username
