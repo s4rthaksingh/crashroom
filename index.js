@@ -17,7 +17,7 @@ function generateUsername(){
 
 let usercount = 0;
 let chosenword = null;
-
+let typeracesentence = null;
 
 const express = require('express');
 const app = express();
@@ -69,6 +69,25 @@ io.on('connection',(socket)=>{
             console.log(chosenword);
             return;
         }
+
+        if (typeracesentence){
+            if (message.message.toLowerCase() == typeracesentence.toLowerCase()){
+                io.emit('message', {'message':`has typed it first!`,username:socket.username});
+                io.emit('enablecopycutpaste');
+                typeracesentence = null;
+                return;
+            }
+        }
+
+        if (message.message == ("/typerace")){
+            sentencelength = ((Math.random()*(15-10+1))+10);
+            typeracesentence = generate(sentencelength).join(" ");
+            io.emit('message',{'message':`${message.username} has started a type race. The sentence is : ${typeracesentence}`,'username':'System'});
+            io.emit('disablecopycutpaste');
+            console.log(typeracesentence);
+            return;
+        }
+
         io.emit('message', message);
     })
     socket.on('disconnect',()=>{

@@ -88,6 +88,34 @@
         username.value = assignedusername;
       })
       socket.on('message', displayMessage);
+
+
+
+      function preventCopy(event) {
+      event.preventDefault();
+      }
+
+      function preventCut(event) {
+          event.preventDefault();
+      }
+
+      function preventPaste(event) {
+          event.preventDefault();
+      }
+
+      socket.on('disablecopycutpaste', () => {
+          document.addEventListener('copy', preventCopy);
+          document.addEventListener('cut', preventCut);
+          document.addEventListener('paste', preventPaste);
+          document.body.style.userSelect = 'none';
+      });
+
+      socket.on('enablecopycutpaste', () => {
+          document.removeEventListener('copy', preventCopy);
+          document.removeEventListener('cut', preventCut);
+          document.removeEventListener('paste', preventPaste);
+          document.body.style.userSelect = 'auto';
+      });
     </script>
   </body>
 </html>
