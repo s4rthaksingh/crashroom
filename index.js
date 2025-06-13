@@ -18,6 +18,8 @@ function generateUsername(){
 let usercount = 0;
 let chosenword = null;
 let typeracesentence = null;
+let usernamelist = [];
+let collectedusercount = 0;
 
 const express = require('express');
 const app = express();
@@ -54,6 +56,7 @@ io.on('connection',(socket)=>{
     })
     socket.on('message',(message)=>{
         if (!message.username || message.username.toLowerCase() == "system") message.username = socket.username;
+        io.emit('message', message);
         if (chosenword) {
             if(message.message == chosenword){
                 io.emit('message', {'message':`has guessed the right word : ${chosenword}`,username:socket.username});
@@ -88,8 +91,31 @@ io.on('connection',(socket)=>{
             return;
         }
 
-        io.emit('message', message);
+        if (message.message == "/users"){
+            io.emit("getUsername");
+        }
+
+
+
     })
+
+    socket.on('sendUsername',(username)=>{
+        usernamelist.push(username);
+        collectedusercount += 1;
+        if (collectedusercount == usercount){
+            let tempmsg = "";
+            usernamelist.forEach(user => {
+                tempmsg += user;
+                tempmsg += "\n";
+            })
+            io.emit('message',{'message':tempmsg,'username':"System"});
+            usernamelist = [];
+            collectedusercount = 0;
+        }
+    });
+
+
+
     socket.on('disconnect',()=>{
         usercount-=1;
         io.emit("updateCount",usercount);
