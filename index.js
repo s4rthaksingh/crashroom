@@ -56,8 +56,8 @@ io.on('connection',(socket)=>{
     })
     socket.on('message',(message)=>{
         if (!message.username || message.username.toLowerCase() == "system") message.username = socket.username;
-        io.emit('message', message);
         if (chosenword) {
+            io.emit('message', message);
             if(message.message == chosenword){
                 io.emit('message', {'message':`has guessed the right word : ${chosenword}`,username:socket.username});
                 chosenword = null;
@@ -65,6 +65,7 @@ io.on('connection',(socket)=>{
             }
         }
         if (message.message.startsWith("/scramble")){
+            io.emit('message', message);
             chosenword = generate({minLength:parseInt(message.message.split(" ")[1]) || 6,
                 maxLength : parseInt(message.message.split(" ")[1]) || null
             });
@@ -74,6 +75,7 @@ io.on('connection',(socket)=>{
         }
 
         if (typeracesentence){
+            io.emit('message', message);
             if (message.message.toLowerCase() == typeracesentence.toLowerCase()){
                 io.emit('message', {'message':`has typed it first!`,username:socket.username});
                 io.emit('enablecopycutpaste');
@@ -83,6 +85,7 @@ io.on('connection',(socket)=>{
         }
 
         if (message.message == ("/typerace")){
+            io.emit('message', message);
             sentencelength = ((Math.random()*(15-10+1))+10);
             typeracesentence = generate(sentencelength).join(" ");
             io.emit('message',{'message':`${message.username} has started a type race. The sentence is : ${typeracesentence}`,'username':'System'});
@@ -92,9 +95,18 @@ io.on('connection',(socket)=>{
         }
 
         if (message.message == "/users"){
+            io.emit('message', message);
             io.emit("getUsername");
+            return;
         }
 
+        if(message.message=="/help"){
+            io.emit('message', message);
+            io.emit('message',{'message':"/scramble\n/typerace\n/users\n/help",'username':'System'})
+            return;
+        }
+
+        io.emit('message', message);
 
 
     })
