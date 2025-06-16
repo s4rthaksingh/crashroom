@@ -39,7 +39,6 @@
     <div id="online-counter">Online: 0</div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      // Cache DOM elements
       const messages = document.getElementById('messages');
       const form = document.getElementById("form");
       const input = document.getElementById('input');
@@ -52,14 +51,14 @@
         return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       }
 
-      // Initialize socket with optimized settings
+
       const socket = io(window.location.origin, {
           transports: ['websocket', 'polling'],
           reconnection: true,
           reconnectionAttempts: 5
       });
 
-      // Optimize message display
+
       function displayMessage(message) {
         const item = document.createElement('li');
         item.innerHTML = `<b>${message.username}</b> (${getCurrentTime()})<br>${message.message}`;

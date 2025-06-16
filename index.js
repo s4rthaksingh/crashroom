@@ -57,8 +57,8 @@ io.on('connection',(socket)=>{
     socket.on('message',(message)=>{
         if (!message.username || message.username.toLowerCase() == "system") message.username = socket.username;
         if (chosenword) {
-            io.emit('message', message);
             if(message.message == chosenword){
+                io.emit('message', message);
                 io.emit('message', {'message':`has guessed the right word : ${chosenword}`,username:socket.username});
                 chosenword = null;
                 return;
