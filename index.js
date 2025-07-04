@@ -20,6 +20,8 @@ let chosenword = null;
 let typeracesentence = null;
 let usernamelist = [];
 let collectedusercount = 0;
+let scrambleTimeout = null;
+let typeraceTimeout = null;
 
 const express = require('express');
 const app = express();
@@ -61,6 +63,7 @@ io.on('connection',(socket)=>{
                 io.emit('message', message);
                 io.emit('message', {'message':`has guessed the right word : ${chosenword}`,username:socket.username});
                 chosenword = null;
+                if (scrambleTimeout) clearTimeout(scrambleTimeout);
                 return;
             }
         }
@@ -71,6 +74,13 @@ io.on('connection',(socket)=>{
             });
             io.emit('message',{'message':`${message.username} has started a game of scramble. The scrambled word is : ${shuffle(chosenword)}`,'username':'System'});
             console.log(chosenword);
+            if (scrambleTimeout) clearTimeout(scrambleTimeout);
+            scrambleTimeout = setTimeout(() => {
+                if (chosenword) {
+                    io.emit('message', {message: `Time's up! The word was: ${chosenword}`, username: 'System'});
+                    chosenword = null;
+                }
+            }, 60000);
             return;
         }
 
@@ -80,8 +90,10 @@ io.on('connection',(socket)=>{
                 io.emit('message', {'message':`has typed it first!`,username:socket.username});
                 io.emit('enablecopycutpaste');
                 typeracesentence = null;
+                if (typeraceTimeout) clearTimeout(typeraceTimeout);
                 return;
             }
+            return;
         }
 
         if (message.message == ("/typerace")){
@@ -91,6 +103,14 @@ io.on('connection',(socket)=>{
             io.emit('message',{'message':`${message.username} has started a type race. The sentence is : ${typeracesentence}`,'username':'System'});
             io.emit('disablecopycutpaste');
             console.log(typeracesentence);
+            if (typeraceTimeout) clearTimeout(typeraceTimeout);
+            typeraceTimeout = setTimeout(() => {
+                if (typeracesentence) {
+                    io.emit('message', {message: `Time's up! The sentence was: ${typeracesentence}`, username: 'System'});
+                    typeracesentence = null;
+                    io.emit('enablecopycutpaste');
+                }
+            }, 60000);
             return;
         }
 
