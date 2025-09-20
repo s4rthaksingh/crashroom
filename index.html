@@ -1,42 +1,478 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Crash room</title>
+    <title>Crashroom</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      :root {
+        --primary-color: #6366f1;
+        --primary-dark: #4f46e5;
+        --secondary-color: #f1f5f9;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --border-color: #e2e8f0;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --error-color: #ef4444;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+        --radius-xl: 1rem;
+      }
 
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; resize: none; height: 2.5rem; font-size: 16px; font-family: inherit; line-height: 2.5rem; overflow-y: auto; }
-      #input:focus { outline: none; }
-      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
 
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
-      #messages > li {white-space: pre-wrap;}
+      * {
+        box-sizing: border-box;
+      }
 
-      #online-counter {
+      body { 
+        margin: 0; 
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        min-height: 100vh;
+        color: var(--text-primary);
+        position: relative;
+      }
+
+      body::before {
+        content: '';
         position: fixed;
-        top: 10px;
-        right: 10px;
-        background: rgba(0, 0, 0, 0.15);
-        padding: 8px 15px;
-        border-radius: 20px;
-        font-size: 14px;
-        color: #333;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+          radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .container {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-primary);
+        position: relative;
+      }
+
+      .header {
+        background: var(--primary-color);
+        color: white;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow-md);
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .online-counter {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-xl);
+        font-size: 0.875rem;
+        font-weight: 500;
         backdrop-filter: blur(10px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+
+      .online-indicator {
+        width: 8px;
+        height: 8px;
+        background: var(--success-color);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+
+      .chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .messages-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background: var(--bg-secondary);
+        scroll-behavior: smooth;
+      }
+
+      .messages-container::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .messages-container::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+      }
+
+      .messages-container::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 3px;
+      }
+
+      .messages-container::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+      }
+
+      #messages { 
+        list-style-type: none; 
+        margin: 0; 
+        padding: 0; 
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .message {
+        display: flex;
+        flex-direction: column;
+        max-width: 70%;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .message.own-message {
+        align-self: flex-end;
+      }
+
+      .message.system-message {
+        align-self: center;
+        max-width: 90%;
+      }
+
+      .message-bubble {
+        background: white;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        position: relative;
+      }
+
+      .message.own-message .message-bubble {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-dark);
+      }
+
+      .message.system-message .message-bubble {
+        background: var(--warning-color);
+        color: white;
+        border-color: #d97706;
+        text-align: center;
+        font-weight: 500;
+      }
+
+      .message-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+      }
+
+      .message.own-message .message-header {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .username {
+        font-weight: 600;
+        color: var(--primary-color);
+      }
+
+      .message.own-message .username {
+        color: white;
+      }
+
+      .timestamp {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+      }
+
+      .message.own-message .timestamp {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .message-content {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        line-height: 1.5;
+      }
+
+      .input-container {
+        background: white;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+      }
+
+      .input-form {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-end;
+      }
+
+      .username-input {
+        width: 200px;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        background: var(--bg-secondary);
+        transition: all 0.2s ease;
+        height: 44px;
+        box-sizing: border-box;
+      }
+
+      .username-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      .message-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-family: inherit;
+        resize: none;
+        height: 44px;
+        max-height: 120px;
+        background: var(--bg-secondary);
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        line-height: 1;
+        overflow-y: auto;
+        vertical-align: top;
+      }
+
+      .message-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      .send-button {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 44px;
+      }
+
+      .send-button:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .send-button:active {
+        transform: translateY(0);
+      }
+
+      .send-button:disabled {
+        background: var(--text-secondary);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .typing-indicator {
+        padding: 0.5rem 1rem;
+        color: var(--text-secondary);
+        font-style: italic;
+        font-size: 0.875rem;
+        animation: pulse 1.5s infinite;
+      }
+
+      .game-notification {
+        background: var(--success-color);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-md);
+        margin: 0.5rem 0;
+        text-align: center;
+        font-weight: 500;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .help-text {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        margin: 0.5rem 0;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        white-space: pre-line;
+      }
+
+      .new-messages-indicator {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-xl);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        z-index: 10;
+        animation: bounce 2s infinite;
+        display: none;
+      }
+
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          width: 100vw;
+          height: 100vh;
+          margin: 0;
+        }
+
+        .header {
+          padding: 1rem;
+        }
+
+        .header h1 {
+          font-size: 1.25rem;
+        }
+
+        .message {
+          max-width: 85%;
+        }
+
+        .input-form {
+          flex-direction: column;
+          gap: 0.5rem;
+          align-items: stretch;
+        }
+
+        .username-input {
+          width: 100%;
+          height: 44px;
+        }
+
+        .message-input {
+          min-height: 44px;
+        }
+
+        .send-button {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .input-container {
+          padding: 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header {
+          padding: 0.75rem;
+        }
+
+        .online-counter {
+          padding: 0.375rem 0.75rem;
+          font-size: 0.75rem;
+        }
+
+        .message {
+          max-width: 95%;
+        }
+
+        .message-bubble {
+          padding: 0.625rem 0.875rem;
+        }
+
+        .input-container {
+          padding: 0.75rem;
+        }
       }
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-      <textarea id="input" autocomplete="off"></textarea>
-      <input id="username" autocomplete="off" placeholder="Enter your username" />
-      <button>Send</button>
+    <div class="container">
+      <div class="header">
+        <h1>💬 Crashroom</h1>
+        <div class="online-counter">
+          <div class="online-indicator"></div>
+          <span id="online-counter">Online: 0</span>
+        </div>
+      </div>
+      
+      <div class="chat-container">
+        <div class="messages-container">
+          <ul id="messages"></ul>
+          <div class="new-messages-indicator" id="new-messages-indicator">
+            New messages ↓
+          </div>
+        </div>
+        
+        <div class="input-container">
+          <form id="form" class="input-form">
+            <input id="username" class="username-input" autocomplete="off" placeholder="Username" />
+            <textarea id="input" class="message-input" autocomplete="off" placeholder="Type your message..."></textarea>
+            <button type="submit" class="send-button">
+              <span>Send</span>
+              <span>📤</span>
+            </button>
     </form>
-    <div id="online-counter">Online: 0</div>
+        </div>
+      </div>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const messages = document.getElementById('messages');
@@ -44,13 +480,39 @@
       const input = document.getElementById('input');
       const username = document.getElementById('username');
       const usercount = document.getElementById("online-counter");
-
+      let currentUsername = '';
+      let isUserScrolledUp = false;
 
       function getCurrentTime() {
         const now = new Date();
         return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       }
 
+      // Check if user is at the bottom of the chat
+      function isAtBottom() {
+        const messagesContainer = document.querySelector('.messages-container');
+        const threshold = 100; // pixels from bottom
+        return messagesContainer.scrollTop + messagesContainer.clientHeight >= messagesContainer.scrollHeight - threshold;
+      }
+
+      // Smart scroll function
+      function smartScroll() {
+        const messagesContainer = document.querySelector('.messages-container');
+        const indicator = document.getElementById('new-messages-indicator');
+        
+        if (isAtBottom() || !isUserScrolledUp) {
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+          indicator.style.display = 'none';
+        } else {
+          // User is scrolled up, show indicator
+          indicator.style.display = 'block';
+        }
+      }
+
+      // Track user scroll behavior
+      function handleScroll() {
+        isUserScrolledUp = !isAtBottom();
+      }
 
       const socket = io(window.location.origin, {
           transports: ['websocket', 'polling'],
@@ -58,26 +520,60 @@
           reconnectionAttempts: 5
       });
 
-
       function displayMessage(message) {
         const item = document.createElement('li');
-        item.innerHTML = `<b>${message.username}</b> (${getCurrentTime()})<br>${message.message}`;
+        const isOwnMessage = message.username === currentUsername;
+        const isSystemMessage = message.username === 'System';
+        
+        item.className = `message ${isOwnMessage ? 'own-message' : ''} ${isSystemMessage ? 'system-message' : ''}`;
+        
+        if (isSystemMessage) {
+          item.innerHTML = `
+            <div class="message-bubble">
+              <div class="message-content">${message.message}</div>
+            </div>
+          `;
+        } else {
+          item.innerHTML = `
+            <div class="message-bubble">
+              <div class="message-header">
+                <span class="username">${message.username}</span>
+                <span class="timestamp">${getCurrentTime()}</span>
+              </div>
+              <div class="message-content">${message.message}</div>
+            </div>
+          `;
+        }
+        
         messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        smartScroll();
       }
 
-      username.addEventListener('change',()=>{
-        if(username.value && username.value.toLowerCase()!="system") socket.emit('changeUsername',username.value);
-      })
+      // Auto-resize textarea
+      input.addEventListener('input', function() {
+        // Only resize if content is taller than the current height
+        if (this.scrollHeight > this.clientHeight) {
+          this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        }
+      });
+
+      username.addEventListener('change', () => {
+        if(username.value && username.value.toLowerCase() !== "system") {
+          currentUsername = username.value.replace(/\s/g, '');
+          socket.emit('changeUsername', currentUsername);
+        }
+      });
 
       form.addEventListener('submit', function(event) {
           event.preventDefault();
-          if(input.value) {
+          if(input.value.trim()) {
+              const messageText = input.value.trim();
               socket.emit('message', {
-                  'message': input.value,
-                  'username': username.value.replace(/\s/g, '')
+                  'message': messageText,
+                  'username': username.value.replace(/\s/g, '') || currentUsername
               });
               input.value = '';
+              input.style.height = '44px';
           }
       });
 
@@ -85,27 +581,79 @@
           if (event.key === 'Enter' && event.shiftKey) {
               event.preventDefault();
               input.value += "\n";
+              // Force resize after adding newline
+              input.style.height = Math.min(input.scrollHeight, 120) + 'px';
           } else if (event.key === 'Enter' && !event.shiftKey) {
               event.preventDefault();
-              if(input.value) {
+              if(input.value.trim()) {
+                  const messageText = input.value.trim();
                   socket.emit('message', {
-                      'message': input.value,
-                      'username': username.value.replace(/\s/g, '')
+                      'message': messageText,
+                      'username': username.value.replace(/\s/g, '') || currentUsername
                   });
                   input.value = '';
+                  input.style.height = '44px';
               }
           }
       });
 
-      socket.on('updateCount',(count)=>{
+      socket.on('updateCount', (count) => {
         usercount.textContent = `Online: ${count}`;
-      })
-      socket.on('setUsername',(assignedusername)=>{
+      });
+
+      socket.on('setUsername', (assignedusername) => {
         username.value = assignedusername;
-      })
+        currentUsername = assignedusername;
+      });
+
+      // Enhanced message handling for special content
+      function displayMessage(message) {
+        const item = document.createElement('li');
+        const isOwnMessage = message.username === currentUsername;
+        const isSystemMessage = message.username === 'System';
+        
+        item.className = `message ${isOwnMessage ? 'own-message' : ''} ${isSystemMessage ? 'system-message' : ''}`;
+        
+        // Handle special message types
+        if (message.message.includes('has started a game of scramble') || 
+            message.message.includes('has started a type race')) {
+          item.innerHTML = `
+            <div class="game-notification">
+              <div class="message-content">${message.message}</div>
+            </div>
+          `;
+        } else if (message.message.includes('/scramble') || 
+                   message.message.includes('/typerace') || 
+                   message.message.includes('/users') || 
+                   message.message.includes('/help')) {
+          item.innerHTML = `
+            <div class="help-text">
+              <div class="message-content">${message.message}</div>
+            </div>
+          `;
+        } else if (isSystemMessage) {
+          item.innerHTML = `
+            <div class="message-bubble">
+              <div class="message-content">${message.message}</div>
+            </div>
+          `;
+        } else {
+          item.innerHTML = `
+            <div class="message-bubble">
+              <div class="message-header">
+                <span class="username">${message.username}</span>
+                <span class="timestamp">${getCurrentTime()}</span>
+              </div>
+              <div class="message-content">${message.message}</div>
+            </div>
+          `;
+        }
+        
+        messages.appendChild(item);
+        smartScroll();
+      }
+
       socket.on('message', displayMessage);
-
-
 
       function preventCopy(event) {
       event.preventDefault();
@@ -124,6 +672,12 @@
           document.addEventListener('cut', preventCut);
           document.addEventListener('paste', preventPaste);
           document.body.style.userSelect = 'none';
+        
+        // Show visual indicator
+        const indicator = document.createElement('div');
+        indicator.className = 'typing-indicator';
+        indicator.textContent = 'Copy/Paste disabled during type race!';
+        messages.appendChild(indicator);
       });
 
       socket.on('enablecopycutpaste', () => {
@@ -131,11 +685,42 @@
           document.removeEventListener('cut', preventCut);
           document.removeEventListener('paste', preventPaste);
           document.body.style.userSelect = 'auto';
+        
+        // Remove typing indicator
+        const indicators = document.querySelectorAll('.typing-indicator');
+        indicators.forEach(indicator => indicator.remove());
       });
 
-      socket.on('getUsername',()=>{
-        socket.emit('sendUsername',username.value);
-      })
+      socket.on('getUsername', () => {
+        socket.emit('sendUsername', username.value || currentUsername);
+      });
+
+      // Add connection status indicator
+      socket.on('connect', () => {
+        console.log('Connected to server');
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+      });
+
+
+      // Add scroll listener to track user behavior
+      const messagesContainer = document.querySelector('.messages-container');
+      messagesContainer.addEventListener('scroll', handleScroll);
+
+      // Handle new messages indicator click
+      const newMessagesIndicator = document.getElementById('new-messages-indicator');
+      newMessagesIndicator.addEventListener('click', () => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        newMessagesIndicator.style.display = 'none';
+        isUserScrolledUp = false;
+      });
+
+      // Focus input on load
+      window.addEventListener('load', () => {
+        input.focus();
+      });
     </script>
   </body>
 </html>
